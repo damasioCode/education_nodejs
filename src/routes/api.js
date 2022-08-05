@@ -4,7 +4,8 @@ import {
   findAllStudents,
   findStudent,
   createStudent,
-  deleteStudent
+  deleteStudent,
+  updateStudent
 } from '../controllers/studentController.js'
 
 const router = Router()
@@ -12,11 +13,13 @@ const router = Router()
 router.get('/', (request, response) => {
   response.send('hello world')
 })
-router.get('/student', findAllStudents)
-router.get('/student/:ra', findStudent)
+router.get('/students', findAllStudents)
+router.get('/students/:ra', findStudent)
 
-router.post('/student', verifyKey, createStudent)
+router.post('/students', verifyKey, createStudent)
 
-router.delete('/student', verifyKey, deleteStudent)
+router.delete('/students/:ra', verifyKey, deleteStudent)
+
+router.put('/students/:ra', verifyKey, updateStudent)
 
 export default router

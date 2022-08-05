@@ -44,13 +44,10 @@ const createStudent = async (request, response) => {
 }
 
 const deleteStudent = async (request, response) => {
-  const { name, email, cpf, ra } = request.body
+  const { ra } = request.params
 
   const deleteStudent = await Student.destroy({
     where: {
-      name,
-      email,
-      cpf,
       ra,
     }
   });
@@ -60,9 +57,28 @@ const deleteStudent = async (request, response) => {
 
 }
 
+const updateStudent = async (request, response) => {
+  const { ra } = request.params;
+  const { name, email } = request.body;
+
+  const getStudent = await Student.findOne({
+    where: { ra }
+  });
+  
+  getStudent.set({
+    name,
+    email
+  })
+
+  await getStudent.save()
+
+  return response.status(200).json({msg: "Student updated successfully!"})
+}
+
 export {
   findAllStudents,
   findStudent,
   createStudent,
-  deleteStudent
+  deleteStudent,
+  updateStudent
 }
