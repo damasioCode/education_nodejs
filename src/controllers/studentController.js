@@ -17,12 +17,12 @@ const findAllStudents = async (request, response) => {
     return response.status(200).json({
       count,
       results: students
-    });
+    })
     
   } catch(error) {
     return response.status(404).json({
       message: error || "Unexpected error!"
-    });
+    })
   }
 }
 
@@ -35,28 +35,47 @@ const findStudent = async (request, response) => {
 
     if( !student ) throw "Student not found!"
 
-    return response.status(200).json(student);
+    return response.status(200).json(student)
 
   } catch (error) {
     return response.status(404).json({
       message: error || "Unexpected error!"
-    });
+    })
   }
 }
 
 const createStudent = async (request, response) => {
-  const { name, email, cpf, ra } = request.body
+  try {
+    const { name, email, cpf, ra } = request.body
+  
+    if( !name || !email || !cpf || !ra )
+      throw "Fill in all fields!"
 
-  const newStudent = await Student.create({
-    id: null,
-    name,
-    email,
-    cpf,
-    ra,
-  });
+    const verifyIfExistsStudent = await Student.findOne({
+      where: { ra }
+    })
 
-  if( newStudent ) 
-    return response.status(200).json({msg: "Student created successfully!"});
+    if( verifyIfExistsStudent )
+      throw "The student already exists!"
+    
+    const createNewStudent = await Student.create({
+      id: null,
+      name,
+      email,
+      cpf,
+      ra,
+    })
+  
+    if( createNewStudent ) 
+      return response.status(200).json({
+        message: "Student created successfully!"
+      })
+
+  } catch ( error ) {
+    return response.status(404).json({
+      message: error || "Unexpected error!"
+    })
+  }
 
 }
 
@@ -67,20 +86,20 @@ const deleteStudent = async (request, response) => {
     where: {
       ra,
     }
-  });
+  })
 
   if( deleteStudent ) 
-    return response.status(200).json({msg: "Student deleted successfully!"});
+    return response.status(200).json({msg: "Student deleted successfully!"})
 
 }
 
 const updateStudent = async (request, response) => {
-  const { ra } = request.params;
-  const { name, email } = request.body;
+  const { ra } = request.params
+  const { name, email } = request.body
 
   const getStudent = await Student.findOne({
     where: { ra }
-  });
+  })
   
   await getStudent.update({
     name,
