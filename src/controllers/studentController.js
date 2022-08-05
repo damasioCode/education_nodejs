@@ -2,7 +2,6 @@ import Student from './../models/Student.js'
 
 const findAllStudents = async (request, response) => {
   try {
-
     const count = await Student.count()
     const students = await Student.findAll({
       raw: true,
@@ -15,25 +14,34 @@ const findAllStudents = async (request, response) => {
   
     if( students.length == 0 ) throw "No students found!"
     
-    return response.json({
+    return response.status(200).json({
       count,
-      "results": students
+      results: students
     });
     
   } catch(error) {
     return response.status(404).json({
-      msg: error
+      message: error || "Unexpected error!"
     });
   }
 }
 
 const findStudent = async (request, response) => {
-  const { ra } = request.params
-  const student = await Student.findOne({
-    where: { ra }
-  })
-  if( student ) return response.status(200).json(student);
-  return response.status(404).json({msg: "student not found!"});
+  try {
+    const { ra } = request.params
+    const student = await Student.findOne({
+      where: { ra }
+    })
+
+    if( !student ) throw "Student not found!"
+
+    return response.status(200).json(student);
+
+  } catch (error) {
+    return response.status(404).json({
+      message: error || "Unexpected error!"
+    });
+  }
 }
 
 const createStudent = async (request, response) => {
