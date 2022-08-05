@@ -1,21 +1,30 @@
 import Student from './../models/Student.js'
 
 const findAllStudents = async (request, response) => {
+  try {
 
-  const students = await Student.findAll({
-    raw: true,
-    offset: 0, 
-    limit: 10,
-    order: [
-      ['name', 'ASC']
-    ] 
-  })
-
-  return response.json({
-    "count": students.length,
-    "data": students
-  });
+    const count = await Student.count()
+    const students = await Student.findAll({
+      raw: true,
+      offset: 0, 
+      limit: 10,
+      order: [
+        ['id', 'ASC']
+      ] 
+    })
   
+    if( students.length == 0 ) throw "No students found!"
+    
+    return response.json({
+      count,
+      "results": students
+    });
+    
+  } catch(error) {
+    return response.status(404).json({
+      msg: error
+    });
+  }
 }
 
 const findStudent = async (request, response) => {
@@ -65,7 +74,7 @@ const updateStudent = async (request, response) => {
     where: { ra }
   });
   
-  getStudent.set({
+  await getStudent.update({
     name,
     email
   })
