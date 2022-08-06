@@ -80,35 +80,49 @@ const createStudent = async (request, response) => {
 }
 
 const deleteStudent = async (request, response) => {
-  const { ra } = request.params
+  try {
+    const { ra } = request.params
+  
+    const deleteStudent = await Student.destroy({
+      where: { ra }
+    })
+  
+    if( !deleteStudent ) throw "Student not found!"
+      return response.status(200).json({
+        message: "Student deleted successfully!"
+      })
 
-  const deleteStudent = await Student.destroy({
-    where: {
-      ra,
-    }
-  })
-
-  if( deleteStudent ) 
-    return response.status(200).json({msg: "Student deleted successfully!"})
-
+  } catch ( error ) {
+    return response.status(404).json({
+      message: error || "Unexpected error!"
+    })
+  } 
 }
 
 const updateStudent = async (request, response) => {
-  const { ra } = request.params
-  const { name, email } = request.body
+  try {
+    const { ra } = request.params
+    const { name, email } = request.body
 
-  const getStudent = await Student.findOne({
-    where: { ra }
-  })
+    if( !name || !email )
+      throw "Fill in all fields!"
   
-  await getStudent.update({
-    name,
-    email
-  })
-
-  await getStudent.save()
-
-  return response.status(200).json({msg: "Student updated successfully!"})
+    const getStudent = await Student.findOne({
+      where: { ra }
+    })
+    
+    await getStudent.update({ name, email })
+  
+    await getStudent.save()
+  
+    return response.status(200).json({
+      message: "Student successfully updated!"
+    })
+  } catch ( error ) {
+    return response.status(404).json({
+      message: error || "Unexpected error!"
+    })
+  }
 }
 
 export {
